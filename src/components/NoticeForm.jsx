@@ -12,16 +12,16 @@ export function NoticeForm() {
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
-  async function handleSubmit(e) {
-    e.preventDefault()
+  async function handleSubmit(event) {
+    event.preventDefault()
     setSuccessMessage('')
     setErrorMessage('')
 
-    // Validação básica
     if (!title.trim()) {
       setErrorMessage('Por favor, insira um título para o aviso.')
       return
     }
+
     if (!message.trim()) {
       setErrorMessage('Por favor, insira uma mensagem para o aviso.')
       return
@@ -34,20 +34,14 @@ export function NoticeForm() {
       await addDoc(noticesRef, {
         title: title.trim(),
         message: message.trim(),
-        type: type,
+        type,
         createdAt: serverTimestamp(),
       })
 
-      // Exibir sucesso
       setSuccessMessage('Aviso enviado com sucesso!')
-
-      // Limpar formulário após 1 segundo
-      setTimeout(() => {
-        setTitle('')
-        setMessage('')
-        setType('update')
-        setSuccessMessage('')
-      }, 1000)
+      setTitle('')
+      setMessage('')
+      setType('update')
     } catch (error) {
       console.error('Erro ao enviar aviso:', error)
       setErrorMessage('Ocorreu um erro ao enviar o aviso. Tente novamente.')
