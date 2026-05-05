@@ -1,10 +1,27 @@
 import './App.css'
 import { collection, deleteDoc, getDocs } from 'firebase/firestore'
+import { useState, useEffect } from 'react'
+import { Moon, Sun } from 'lucide-react'
 import { db } from './firebase.config'
 import { NoticeBoard } from './components/NoticeBoard'
 import { NoticeForm } from './components/NoticeForm'
 
 function App() {
+  const [theme, setTheme] = useState('light')
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light'
+    setTheme(savedTheme)
+    document.documentElement.setAttribute('data-theme', savedTheme)
+  }, [])
+
+  function toggleTheme() {
+    const newTheme = theme === 'light' ? 'dark' : 'light'
+    setTheme(newTheme)
+    localStorage.setItem('theme', newTheme)
+    document.documentElement.setAttribute('data-theme', newTheme)
+  }
+
   async function handleDeleteAll() {
     const confirmed = window.confirm(
       'ATENÇÃO: Esta ação irá excluir TODOS os avisos permanentemente. Tem certeza absoluta de que deseja continuar?'
@@ -31,11 +48,23 @@ function App() {
   return (
     <main>
       <header className="app-header">
-        <h1>Workshop Connect</h1>
-        <p>
-          Mural digital para atualizações de serviço e alertas de segurança da
-          oficina.
-        </p>
+        <div className="header-content">
+          <div>
+            <h1>Workshop Connect</h1>
+            <p>
+              Mural digital para atualizações de serviço e alertas de segurança da
+              oficina.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="theme-toggle"
+            aria-label={`Alternar para tema ${theme === 'light' ? 'escuro' : 'claro'}`}
+          >
+            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+          </button>
+        </div>
       </header>
 
       <NoticeForm />

@@ -1,21 +1,115 @@
 .notice-board {
-  border: 2px solid #4c4c4c;
+  border: 2px solid var(--border);
   border-radius: 8px;
   padding: 1rem;
   margin: 1rem auto;
   max-width: 900px;
-  background: #f9f9f9;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .notice-board header h2 {
   margin: 0 0 0.5rem;
 }
 
-.notice-filter-bar {
+.notice-board .notice-filter-bar {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin: 1rem 0;
+}
+
+.notice-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: var(--header-bg);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: #6c757d;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.sort-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sort-icon {
+  color: #6c757d;
+}
+
+.sort-select {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-width: 180px;
+}
+
+.date-input {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.pdf-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.pdf-button:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.pdf-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.pdf-button:focus {
+  outline: 2px solid #333;
+  outline-offset: 2px;
 }
 
 .notice-filter-bar .filter-button {

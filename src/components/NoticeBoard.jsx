@@ -1,7 +1,9 @@
 // src/components/NoticeBoard.jsx
 import { useEffect, useMemo, useState } from 'react'
 import { collection, deleteDoc, doc, onSnapshot, orderBy, query, Timestamp } from 'firebase/firestore'
-import { Clock, Info, ShieldAlert, Tag } from 'lucide-react'
+import { Clock, Info, ShieldAlert, Tag, Search, Download, SortAsc } from 'lucide-react'
+import jsPDF from 'jspdf'
+import 'jspdf-autotable'
 import { db } from '../firebase.config'
 import './NoticeBoard.css'
 
@@ -27,6 +29,40 @@ const badgeMap = {
 }
 
 const defaultBadge = badgeMap.update
+
+function sortNotices(notices, sortOption, specificDate) {
+  const sorted = [...notices]
+
+  switch (sortOption) {
+    case 'a-z':
+      return sorted.sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'))
+    case 'oldest':
+      return sorted.sort((a, b) => a.createdAt - b.createdAt)
+    case 'newest':
+      return sorted.sort((a, b) => b.createdAt - a.createdAt)
+    case 'date':
+      if (specificDate) {
+        const targetDate = new Date(specificDate)
+        return sorted.filter(notice => {
+          const noticeDate = new Date(notice.createdAt)
+          return noticeDate.toDateString() === targetDate.toDateString()
+        })
+      }
+      return sorted
+    default:
+      return sorted
+  }
+}
+
+function filterNoticesBySearch(notices, searchTerm) {
+  if (!searchTerm.trim()) return notices
+
+  const term = searchTerm.toLowerCase()
+  return notices.filter(notice =>
+    notice.title.toLowerCase().includes(term) ||
+    notice.message.toLowerCase().includes(term)
+  )
+}
 
 function NoticeSkeleton() {
   return (
@@ -86,8 +122,11 @@ export function NoticeBoard() {
   const [error, setError] = useState(null)
   const [activeFilter, setActiveFilter] = useState('all')
   const [expandedItem, setExpandedItem] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortOption, setSortOption] = useState('newest')
+  const [specificDate, setSpecificDate] = useState('')
 
-  const filteredAnnouncements = useMemo(
+  const filteredByCategory = useMemo(
     () =>
       activeFilter === 'all'
         ? announcements
@@ -95,12 +134,22 @@ export function NoticeBoard() {
     [activeFilter, announcements]
   )
 
+  const filteredBySearch = useMemo(
+    () => filterNoticesBySearch(filteredByCategory, searchTerm),
+    [filteredByCategory, searchTerm]
+  )
+
+  const sortedAndFiltered = useMemo(
+    () => sortNotices(filteredBySearch, sortOption, specificDate),
+    [filteredBySearch, sortOption, specificDate]
+  )
+
   const activeFilterLabel = useMemo(
     () => filterOptions.find((option) => option.value === activeFilter)?.label || 'Todos',
     [activeFilter]
   )
 
-  const showEmptyState = !loading && !error && filteredAnnouncements.length === 0
+  const showEmptyState = !loading && !error && sortedAndFiltered.length === 0
 
   function handleFilter(type) {
     setActiveFilter(type)
@@ -108,6 +157,31 @@ export function NoticeBoard() {
 
   function toggleExpand(itemId) {
     setExpandedItem(expandedItem === itemId ? null : itemId)
+  }
+
+  function generatePDF() {
+    const doc = new jsPDF()
+    doc.setFontSize(18)
+    doc.text('Relatório de Avisos - Workshop Connect', 14, 22)
+    doc.setFontSize(11)
+    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 32)
+    doc.text(`Filtros aplicados: ${activeFilterLabel}${searchTerm ? ` | Busca: "${searchTerm}"` : ''}`, 14, 40)
+
+    const tableColumn = ['Título', 'Tipo', 'Data', 'Mensagem']
+    const tableRows = []
+
+    sortedAndFiltered.forEach(notice => {
+      const noticeData = [
+        notice.title,
+        badgeMap[notice.type]?.label || 'Atualização',
+        notice.createdAt.toLocaleDateString('pt-BR'),
+        notice.message.length > 100 ? notice.message.substring(0, 100) + '...' : notice.message
+      ]
+      tableRows.push(noticeData)
+    })
+
+    doc.autoTable(tableColumn, tableRows, { startY: 50 })
+    doc.save(`relatorio-avisos-${new Date().toISOString().split('T')[0]}.pdf`)
   }
 
   useEffect(() => {
@@ -171,19 +245,50 @@ export function NoticeBoard() {
         </p>
       </header>
 
-      <div className="notice-filter-bar" role="tablist" aria-label="Filtros de categoria de aviso">
-        {filterOptions.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            className={`filter-button ${activeFilter === option.value ? 'filter-button-active' : ''}`}
-            onClick={() => handleFilter(option.value)}
-            role="tab"
-            aria-selected={activeFilter === option.value}
+      <div className="notice-controls">
+        <div className="search-container">
+          <Search size={16} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Buscar avisos..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+        </div>
+
+        <div className="sort-container">
+          <SortAsc size={16} className="sort-icon" />
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            className="sort-select"
           >
-            {option.label}
-          </button>
-        ))}
+            <option value="newest">Mais Novo para mais Antigo</option>
+            <option value="oldest">Mais Antigo para mais Novo</option>
+            <option value="a-z">A-Z (Ordem alfabética)</option>
+            <option value="date">Filtrar por Data Específica</option>
+          </select>
+        </div>
+
+        {sortOption === 'date' && (
+          <input
+            type="date"
+            value={specificDate}
+            onChange={(e) => setSpecificDate(e.target.value)}
+            className="date-input"
+          />
+        )}
+
+        <button
+          type="button"
+          onClick={generatePDF}
+          className="pdf-button"
+          disabled={sortedAndFiltered.length === 0}
+        >
+          <Download size={16} />
+          Gerar PDF
+        </button>
       </div>
 
       {activeFilter !== 'all' && (
@@ -203,13 +308,15 @@ export function NoticeBoard() {
       {showEmptyState && (
         <p>
           {activeFilter === 'all'
-            ? 'O mural está limpo no momento. Use o formulário acima para publicar o primeiro aviso.'
+            ? searchTerm
+              ? `Nenhum aviso encontrado para "${searchTerm}".`
+              : 'O mural está limpo no momento. Use o formulário acima para publicar o primeiro aviso.'
             : `Nenhum aviso encontrado para "${activeFilterLabel}". Tente outro filtro.`}
         </p>
       )}
 
       <ul className="notice-list">
-        {filteredAnnouncements.map((item) => {
+        {sortedAndFiltered.map((item) => {
           const badge = badgeMap[item.type] ?? defaultBadge
           const Icon = badge.Icon
           const isExpanded = expandedItem === item.id
