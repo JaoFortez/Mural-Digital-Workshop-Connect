@@ -1,8 +1,7 @@
-// src/components/NoticeBoard.jsx
 import { useEffect, useMemo, useState } from 'react'
 import { collection, deleteDoc, doc, onSnapshot, orderBy, query, Timestamp } from 'firebase/firestore'
 import { Clock, Info, ShieldAlert, Tag, Search, Download, SortAsc } from 'lucide-react'
-import jsPDF from 'jspdf'
+import { jsPDF } from 'jspdf'
 import 'jspdf-autotable'
 import { db } from '../firebase.config'
 import './NoticeBoard.css'
@@ -110,7 +109,11 @@ function formatRelativeDate(date) {
     })}`
   }
 
-  return `Postado em ${date.toLocaleDateString('pt-BR')} às ${date.toLocaleTimeString('pt-BR', {
+  return `Postado em ${date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })} às ${date.toLocaleTimeString('pt-BR', {
     hour: '2-digit',
     minute: '2-digit',
   })}`
@@ -160,28 +163,52 @@ export function NoticeBoard() {
   }
 
   function generatePDF() {
-    const doc = new jsPDF()
-    doc.setFontSize(18)
-    doc.text('Relatório de Avisos - Workshop Connect', 14, 22)
-    doc.setFontSize(11)
-    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 32)
-    doc.text(`Filtros aplicados: ${activeFilterLabel}${searchTerm ? ` | Busca: "${searchTerm}"` : ''}`, 14, 40)
+    try {
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text('Relatório de Avisos - Workshop Connect', 14, 22);
+      doc.setFontSize(11);
+      doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 32);
+      doc.text(`Filtros aplicados: ${activeFilterLabel}${searchTerm ? ` | Busca: "${searchTerm}"` : ''}`, 14, 40);
 
-    const tableColumn = ['Título', 'Tipo', 'Data', 'Mensagem']
-    const tableRows = []
+      let yPosition = 50;
+      doc.setFontSize(10);
 
-    sortedAndFiltered.forEach(notice => {
-      const noticeData = [
-        notice.title,
-        badgeMap[notice.type]?.label || 'Atualização',
-        notice.createdAt.toLocaleDateString('pt-BR'),
-        notice.message.length > 100 ? notice.message.substring(0, 100) + '...' : notice.message
-      ]
-      tableRows.push(noticeData)
-    })
+      // Cabeçalhos
+      doc.text('Título | Tipo | Data | Mensagem', 14, yPosition);
+      yPosition += 10;
 
-    doc.autoTable(tableColumn, tableRows, { startY: 50 })
-    doc.save(`relatorio-avisos-${new Date().toISOString().split('T')[0]}.pdf`)
+      // Linha separadora
+      doc.text('-'.repeat(80), 14, yPosition);
+      yPosition += 10;
+
+      // Dados
+      sortedAndFiltered.forEach(notice => {
+        const title = notice.title.length > 15 ? notice.title.substring(0, 15) + '...' : notice.title;
+        const type = (badgeMap[notice.type]?.label || 'Atualização').substring(0, 10);
+        const date = notice.createdAt.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+        const message = notice.message.length > 30 ? notice.message.substring(0, 30) + '...' : notice.message;
+
+        const rowText = `${title} | ${type} | ${date} | ${message}`;
+        doc.text(rowText, 14, yPosition);
+        yPosition += 8;
+
+        if (yPosition > 270) {
+          doc.addPage();
+          yPosition = 20;
+        }
+      });
+
+      doc.save(`relatorio-avisos-${new Date().toISOString().split('T')[0]}.pdf`);
+      console.log('PDF gerado com sucesso');
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      alert(`Erro ao gerar PDF: ${error.message}`);
+    }
   }
 
   useEffect(() => {
@@ -275,8 +302,31 @@ export function NoticeBoard() {
           <input
             type="date"
             value={specificDate}
-            onChange={(e) => setSpecificDate(e.target.value)}
+            onChange={(e) => {
+              const dateValue = e.target.value;
+              // Validar se a data é válida
+              if (dateValue) {
+                const date = new Date(dateValue);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                // Impedir datas futuras e datas muito antigas (mais de 10 anos)
+                const tenYearsAgo = new Date();
+                tenYearsAgo.setFullYear(today.getFullYear() - 10);
+
+                if (date > today) {
+                  alert('Não é possível filtrar por datas futuras.');
+                  return;
+                }
+                if (date < tenYearsAgo) {
+                  alert('Data muito antiga. Use uma data dos últimos 10 anos.');
+                  return;
+                }
+              }
+              setSpecificDate(dateValue);
+            }}
             className="date-input"
+            max={new Date().toISOString().split('T')[0]}
           />
         )}
 
@@ -342,7 +392,14 @@ export function NoticeBoard() {
                 {isExpanded && (
                   <div className="notice-details">
                     <span className="notice-full-date">
-                      Criado em: {item.createdAt.toLocaleDateString('pt-BR')} às {item.createdAt.toLocaleTimeString('pt-BR')}
+                      Criado em: {item.createdAt.toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                      })} às {item.createdAt.toLocaleTimeString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </span>
                   </div>
                 )}

@@ -10,6 +10,9 @@
 
 .notice-board header h2 {
   margin: 0 0 0.5rem;
+  color: var(--text);
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .notice-board .notice-filter-bar {
@@ -42,20 +45,22 @@
 .search-icon {
   position: absolute;
   left: 0.75rem;
-  color: #6c757d;
+  color: var(--gray);
 }
 
 .search-input {
   width: 100%;
   padding: 0.5rem 0.75rem 0.5rem 2.5rem;
-  border: 1px solid #ced4da;
+  border: 1px solid var(--gray-border);
   border-radius: 4px;
   font-size: 0.9rem;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #80bdff;
+  border-color: var(--accent);
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
@@ -66,22 +71,26 @@
 }
 
 .sort-icon {
-  color: #6c757d;
+  color: var(--gray);
 }
 
 .sort-select {
   padding: 0.5rem;
-  border: 1px solid #ced4da;
+  border: 1px solid var(--gray-border);
   border-radius: 4px;
   font-size: 0.9rem;
   min-width: 180px;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .date-input {
   padding: 0.5rem;
-  border: 1px solid #ced4da;
+  border: 1px solid var(--gray-border);
   border-radius: 4px;
   font-size: 0.9rem;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .pdf-button {
@@ -89,8 +98,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: #28a745;
-  color: white;
+  background-color: var(--success);
+  color: var(--light);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -99,24 +108,24 @@
 }
 
 .pdf-button:hover:not(:disabled) {
-  background-color: #218838;
+  background-color: var(--success-hover);
 }
 
 .pdf-button:disabled {
-  background-color: #6c757d;
+  background-color: var(--secondary);
   cursor: not-allowed;
 }
 
 .pdf-button:focus {
-  outline: 2px solid #333;
+  outline: 2px solid var(--dark);
   outline-offset: 2px;
 }
 
 .notice-filter-bar .filter-button {
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background-color: #fff;
-  color: #333;
+  background-color: var(--bg);
+  color: var(--text);
   padding: 0.5rem 0.9rem;
   cursor: pointer;
   font-size: 0.95rem;
@@ -125,26 +134,26 @@
 
 .active-filter-label {
   margin-bottom: 1rem;
-  color: #555;
+  color: var(--muted);
   font-size: 0.95rem;
 }
 
 .active-filter-label strong {
-  color: #212529;
+  color: var(--text);
 }
 
 .notice-filter-bar .filter-button:hover,
 .notice-filter-bar .filter-button:focus {
-  background-color: #f0f0f0;
-  border-color: #999;
+  background-color: var(--gray-hover);
+  border-color: var(--gray);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .notice-filter-bar .filter-button-active {
-  background-color: #0275d8;
-  color: #fff;
-  border-color: #0275d8;
+  background-color: var(--info);
+  color: var(--light);
+  border-color: var(--info);
 }
 
 .notice-board .notice-list {
@@ -154,11 +163,11 @@
 }
 
 .notice-board .notice-item {
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 6px;
   margin: 0.75rem 0;
   padding: 0.75rem;
-  background-color: #fff;
+  background-color: var(--bg);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   transform-origin: center center;
@@ -198,64 +207,64 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #fff;
+  color: var(--light);
 }
 
 .notice-board .badge-update {
-  background-color: #0275d8;
+  background-color: var(--badge-update);
 }
 
 .notice-board .badge-alert {
-  background-color: #d9534f;
+  background-color: var(--badge-alert);
 }
 
 .notice-board .badge-promotion {
-  background-color: #fd7e14;
+  background-color: var(--badge-promotion);
 }
 
 .notice-board .badge-safety {
-  background-color: #c82333;
+  background-color: var(--badge-safety);
 }
 
 .notice-board .badge-schedule {
-  background-color: #ffc107;
-  color: #212529;
+  background-color: var(--badge-schedule);
+  color: var(--text);
 }
 
 .notice-board .notice-icon.badge-update {
-  color: #0275d8;
+  color: var(--badge-update);
 }
 
 .notice-board .notice-icon.badge-alert {
-  color: #d9534f;
+  color: var(--badge-alert);
 }
 
 .notice-board .notice-icon.badge-promotion {
-  color: #fd7e14;
+  color: var(--badge-promotion);
 }
 
 .notice-board .notice-icon.badge-safety {
-  color: #c82333;
+  color: var(--badge-safety);
 }
 
 .notice-board .notice-icon.badge-schedule {
-  color: #ffc107;
+  color: var(--badge-schedule);
 }
 
 .notice-board .notice-icon.badge-tip {
-  color: #ff8c00;
+  color: var(--badge-tip);
 }
 
 .notice-board .notice-icon.badge-team {
-  color: #6f42c1;
+  color: var(--badge-team);
 }
 
 .notice-board .badge-tip {
-  background-color: #ff8c00;
+  background-color: var(--badge-tip);
 }
 
 .notice-board .badge-team {
-  background-color: #6f42c1;
+  background-color: var(--badge-team);
 }
 
 .notice-board .notice-item h3 {
@@ -278,24 +287,24 @@
 .notice-board .notice-details {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--muted-border);
 }
 
 .notice-board .notice-timestamp {
   display: block;
-  color: #666;
+  color: var(--muted);
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
 }
 
 .notice-board .notice-full-date {
-  color: #333;
+  color: var(--text);
   font-weight: 500;
 }
 
 .notice-board .expand-button {
-  background-color: #6c757d;
-  color: white;
+  background-color: var(--gray);
+  color: var(--light);
   border: none;
   border-radius: 4px;
   padding: 0.4rem 0.8rem;
@@ -307,22 +316,22 @@
 }
 
 .notice-board .expand-button:hover {
-  background-color: #5a6268;
+  background-color: var(--gray-dark);
 }
 
 .notice-board .expand-button:focus {
-  outline: 2px solid #333;
+  outline: 2px solid var(--dark);
   outline-offset: 2px;
 }
 
 .notice-board .error {
-  color: #c00;
+  color: var(--danger);
   font-weight: bold;
 }
 
 .notice-board .delete-button {
-  background-color: #dc3545;
-  color: white;
+  background-color: var(--danger);
+  color: var(--light);
   border: none;
   border-radius: 4px;
   padding: 0.5rem 1rem;
@@ -334,16 +343,16 @@
 }
 
 .notice-board .delete-button:hover {
-  background-color: #c82333;
+  background-color: var(--danger-hover);
 }
 
 .notice-board .delete-button:focus {
-  outline: 2px solid #333;
+  outline: 2px solid var(--dark);
   outline-offset: 2px;
 }
 
 .notice-board .delete-button:active {
-  background-color: #bd2130;
+  background-color: var(--danger-dark);
 }
 
 .notice-skeleton-list {
@@ -353,18 +362,18 @@
 }
 
 .notice-skeleton {
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 6px;
   margin: 0.75rem 0;
   padding: 0.75rem;
-  background-color: #fff;
+  background-color: var(--bg);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
 }
 
 .skeleton-block {
   height: 1rem;
   border-radius: 999px;
-  background: linear-gradient(90deg, #ececec 25%, #f5f5f5 50%, #ececec 75%);
+  background: linear-gradient(90deg, var(--muted-bg) 25%, var(--muted-bg-light) 50%, var(--muted-bg) 75%);
   background-size: 200% 100%;
   animation: skeleton-loading 1.2s ease-in-out infinite;
   margin-bottom: 0.75rem;
