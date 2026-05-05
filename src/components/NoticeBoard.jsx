@@ -1,17 +1,32 @@
 // src/components/NoticeBoard.jsx
-import { useEffect, useState } from 'react'
-import {
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  Timestamp,
-} from 'firebase/firestore'
+import { useEffect, useMemo, useState } from 'react'
+import { collection, deleteDoc, doc, onSnapshot, orderBy, query, Timestamp } from 'firebase/firestore'
 import { Clock, Info, ShieldAlert, Tag } from 'lucide-react'
 import { db } from '../firebase.config'
 import './NoticeBoard.css'
+
+const filterOptions = [
+  { value: 'all', label: 'Todos' },
+  { value: 'update', label: 'Atualização' },
+  { value: 'alert', label: 'Alerta' },
+  { value: 'promotion', label: 'Promoção' },
+  { value: 'safety', label: 'Segurança' },
+  { value: 'schedule', label: 'Funcionamento' },
+  { value: 'tip', label: 'Dica' },
+  { value: 'team', label: 'Equipe' },
+]
+
+const badgeMap = {
+  update: { color: 'badge-update', label: 'Atualização', Icon: Info },
+  alert: { color: 'badge-alert', label: 'Alerta', Icon: Info },
+  promotion: { color: 'badge-promotion', label: 'Promoção', Icon: Tag },
+  safety: { color: 'badge-safety', label: 'Segurança', Icon: ShieldAlert },
+  schedule: { color: 'badge-schedule', label: 'Funcionamento', Icon: Clock },
+  tip: { color: 'badge-tip', label: 'Dica', Icon: Tag },
+  team: { color: 'badge-team', label: 'Equipe', Icon: Tag },
+}
+
+const defaultBadge = badgeMap.update
 
 function NoticeSkeleton() {
   return (
@@ -31,10 +46,13 @@ function NoticeSkeleton() {
 }
 
 function formatRelativeDate(date) {
+  if (!(date instanceof Date) || Number.isNaN(date)) {
+    return 'Data não disponível'
+  }
+
   const now = new Date()
   const diffMs = now - date
   const diffMinutes = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMinutes / 60)
 
   const isSameDay =
     date.getDate() === now.getDate() &&
@@ -62,87 +80,26 @@ function formatRelativeDate(date) {
   })}`
 }
 
-function getBadgeColor(type) {
-  switch (type) {
-    case 'safety':
-      return 'badge-safety'
-    case 'schedule':
-      return 'badge-schedule'
-    case 'tip':
-      return 'badge-tip'
-    case 'team':
-      return 'badge-team'
-    case 'alert':
-      return 'badge-alert'
-    case 'promotion':
-      return 'badge-promotion'
-    case 'update':
-    default:
-      return 'badge-update'
-  }
-}
-
-function getBadgeLabel(type) {
-  switch (type) {
-    case 'safety':
-      return 'Segurança'
-    case 'schedule':
-      return 'Funcionamento'
-    case 'tip':
-      return 'Dica'
-    case 'team':
-      return 'Equipe'
-    case 'alert':
-      return 'Alerta'
-    case 'promotion':
-      return 'Promoção'
-    case 'update':
-    default:
-      return 'Atualização'
-  }
-}
-
-function getBadgeIcon(type) {
-  switch (type) {
-    case 'safety':
-      return ShieldAlert
-    case 'schedule':
-      return Clock
-    case 'tip':
-      return Tag
-    case 'promotion':
-      return Tag
-    case 'update':
-      return Info
-    default:
-      return Info
-  }
-}
-
 export function NoticeBoard() {
   const [announcements, setAnnouncements] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [activeFilter, setActiveFilter] = useState('all')
 
-  const filterOptions = [
-    { value: 'all', label: 'Todos' },
-    { value: 'update', label: 'Atualização' },
-    { value: 'alert', label: 'Alerta' },
-    { value: 'promotion', label: 'Promoção' },
-    { value: 'safety', label: 'Segurança' },
-    { value: 'schedule', label: 'Funcionamento' },
-    { value: 'tip', label: 'Dica' },
-    { value: 'team', label: 'Equipe' },
-  ]
+  const filteredAnnouncements = useMemo(
+    () =>
+      activeFilter === 'all'
+        ? announcements
+        : announcements.filter((item) => item.type === activeFilter),
+    [activeFilter, announcements]
+  )
 
-  const filteredAnnouncements =
-    activeFilter === 'all'
-      ? announcements
-      : announcements.filter((item) => item.type === activeFilter)
+  const activeFilterLabel = useMemo(
+    () => filterOptions.find((option) => option.value === activeFilter)?.label || 'Todos',
+    [activeFilter]
+  )
 
-  const activeFilterLabel =
-    filterOptions.find((option) => option.value === activeFilter)?.label || 'Todos'
+  const showEmptyState = !loading && !error && filteredAnnouncements.length === 0
 
   function handleFilter(type) {
     setActiveFilter(type)
@@ -166,7 +123,7 @@ export function NoticeBoard() {
             title: payload.title || 'Aviso sem título',
             message: payload.message || '',
             type: payload.type || 'update',
-            createdAt: ts,
+            createdAt: ts || new Date(),
           }
         })
 
@@ -191,7 +148,6 @@ export function NoticeBoard() {
       const docRef = doc(db, 'noticeBoard', docId)
       await deleteDoc(docRef)
 
-      // Remover aviso da lista local
       setAnnouncements((prevAnnouncements) =>
         prevAnnouncements.filter((item) => item.id !== docId)
       )
@@ -239,43 +195,47 @@ export function NoticeBoard() {
       )}
       {error && <p role="alert" className="error">{error}</p>}
 
-      {!loading && !error && announcements.length === 0 && (
-        <p>O mural está limpo no momento. Use o formulário acima para publicar o primeiro aviso.</p>
+      {showEmptyState && (
+        <p>
+          {activeFilter === 'all'
+            ? 'O mural está limpo no momento. Use o formulário acima para publicar o primeiro aviso.'
+            : `Nenhum aviso encontrado para "${activeFilterLabel}". Tente outro filtro.`}
+        </p>
       )}
 
       <ul className="notice-list">
-        {filteredAnnouncements.map((item) => (
-          <li key={item.id}>
-            <article className={`notice-item notice-${item.type}`}>
-              <div className="notice-card-header">
-                <span className={`notice-icon ${getBadgeColor(item.type)}`}>
-                  {(() => {
-                    const Icon = getBadgeIcon(item.type)
-                    return <Icon size={16} />
-                  })()}
-                </span>
-                <span className={`notice-badge ${getBadgeColor(item.type)}`}>
-                  {getBadgeLabel(item.type)}
-                </span>
-                <h3>{item.title}</h3>
-              </div>
-              {item.createdAt && (
-                <time dateTime={item.createdAt.toISOString()}>
-                  {formatRelativeDate(item.createdAt)}
-                </time>
-              )}
-              <p>{item.message}</p>
-              <button
-                className="delete-button"
-                onClick={() => handleDelete(item.id)}
-                aria-label={`Excluir aviso: ${item.title}`}
-                title="Excluir este aviso"
-              >
-                🗑️ Excluir
-              </button>
-            </article>
-          </li>
-        ))}
+        {filteredAnnouncements.map((item) => {
+          const badge = badgeMap[item.type] ?? defaultBadge
+          const Icon = badge.Icon
+
+          return (
+            <li key={item.id}>
+              <article className={`notice-item notice-${item.type}`}>
+                <div className="notice-card-header">
+                  <span className={`notice-icon ${badge.color}`}>
+                    <Icon size={16} />
+                  </span>
+                  <span className={`notice-badge ${badge.color}`}>{badge.label}</span>
+                  <h3>{item.title}</h3>
+                </div>
+                {item.createdAt && (
+                  <time dateTime={item.createdAt.toISOString()}>
+                    {formatRelativeDate(item.createdAt)}
+                  </time>
+                )}
+                <p>{item.message}</p>
+                <button
+                  className="delete-button"
+                  onClick={() => handleDelete(item.id)}
+                  aria-label={`Excluir aviso: ${item.title}`}
+                  title="Excluir este aviso"
+                >
+                  🗑️ Excluir
+                </button>
+              </article>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )

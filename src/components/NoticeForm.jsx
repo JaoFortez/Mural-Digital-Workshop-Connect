@@ -1,9 +1,21 @@
 // src/components/NoticeForm.jsx
 import { useState } from 'react'
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
-import { Clock, Edit3, MessageSquare, Send, Tag, Trash2 } from 'lucide-react'
+import { Edit3, MessageSquare, Send, Tag, Trash2 } from 'lucide-react'
 import { db } from '../firebase.config'
 import './NoticeForm.css'
+
+const maxMessageLength = 500
+
+const noticeTypeOptions = [
+  { value: 'update', label: 'Atualização' },
+  { value: 'alert', label: 'Alerta' },
+  { value: 'promotion', label: 'Promoção' },
+  { value: 'safety', label: 'Segurança' },
+  { value: 'schedule', label: 'Funcionamento' },
+  { value: 'tip', label: 'Dica' },
+  { value: 'team', label: 'Equipe' },
+]
 
 export function NoticeForm() {
   const [title, setTitle] = useState('')
@@ -13,7 +25,6 @@ export function NoticeForm() {
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
-  const maxMessageLength = 500
   const remainingChars = maxMessageLength - message.length
   const isNearLimit = remainingChars <= 50
 
@@ -86,7 +97,6 @@ export function NoticeForm() {
         <fieldset>
           <legend className="sr-only">Formulário de novo aviso</legend>
 
-          {/* Campo Título */}
           <div className="form-group">
             <label htmlFor="notice-title" className="label-with-icon">
               <Edit3 size={14} className="label-icon" />
@@ -105,7 +115,6 @@ export function NoticeForm() {
             />
           </div>
 
-          {/* Campo Mensagem */}
           <div className="form-group">
             <label htmlFor="notice-message" className="label-with-icon">
               <MessageSquare size={14} className="label-icon" />
@@ -130,7 +139,6 @@ export function NoticeForm() {
             </div>
           </div>
 
-          {/* Campo Tipo de Aviso */}
           <div className="form-group">
             <label htmlFor="notice-type" className="label-with-icon">
               <Tag size={14} className="label-icon" />
@@ -142,17 +150,14 @@ export function NoticeForm() {
               onChange={(e) => setType(e.target.value)}
               disabled={submitting}
             >
-              <option value="update">Atualização</option>
-              <option value="alert">Alerta</option>
-              <option value="promotion">Promoção</option>
-              <option value="safety">Segurança</option>
-              <option value="schedule">Funcionamento</option>
-              <option value="tip">Dica</option>
-              <option value="team">Equipe</option>
+              {noticeTypeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
 
-          {/* Botões */}
           <div className="form-actions">
             <button
               type="button"
