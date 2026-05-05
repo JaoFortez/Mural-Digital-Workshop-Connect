@@ -1,6 +1,7 @@
 // src/components/NoticeForm.jsx
 import { useState } from 'react'
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { Clock, Edit3, MessageSquare, Send, Tag, Trash2 } from 'lucide-react'
 import { db } from '../firebase.config'
 import './NoticeForm.css'
 
@@ -11,6 +12,18 @@ export function NoticeForm() {
   const [submitting, setSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+
+  const maxMessageLength = 500
+  const remainingChars = maxMessageLength - message.length
+  const isNearLimit = remainingChars <= 50
+
+  function handleReset() {
+    setTitle('')
+    setMessage('')
+    setType('update')
+    setSuccessMessage('')
+    setErrorMessage('')
+  }
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -75,7 +88,8 @@ export function NoticeForm() {
 
           {/* Campo Título */}
           <div className="form-group">
-            <label htmlFor="notice-title">
+            <label htmlFor="notice-title" className="label-with-icon">
+              <Edit3 size={14} className="label-icon" />
               Título <span aria-label="obrigatório">*</span>
             </label>
             <input
@@ -93,7 +107,8 @@ export function NoticeForm() {
 
           {/* Campo Mensagem */}
           <div className="form-group">
-            <label htmlFor="notice-message">
+            <label htmlFor="notice-message" className="label-with-icon">
+              <MessageSquare size={14} className="label-icon" />
               Mensagem <span aria-label="obrigatório">*</span>
             </label>
             <textarea
@@ -103,15 +118,24 @@ export function NoticeForm() {
               placeholder="Descreva o aviso em detalhes..."
               disabled={submitting}
               rows={5}
-              maxLength={500}
+              maxLength={maxMessageLength}
               required
               aria-required="true"
             />
+            <div
+              className={`char-counter ${isNearLimit ? 'char-counter-warning' : ''}`}
+              aria-live="polite"
+            >
+              {remainingChars} caracteres restantes
+            </div>
           </div>
 
           {/* Campo Tipo de Aviso */}
           <div className="form-group">
-            <label htmlFor="notice-type">Tipo de Aviso</label>
+            <label htmlFor="notice-type" className="label-with-icon">
+              <Tag size={14} className="label-icon" />
+              Tipo de Aviso
+            </label>
             <select
               id="notice-type"
               value={type}
@@ -121,16 +145,30 @@ export function NoticeForm() {
               <option value="update">Atualização</option>
               <option value="alert">Alerta</option>
               <option value="promotion">Promoção</option>
+              <option value="safety">Segurança</option>
+              <option value="schedule">Funcionamento</option>
+              <option value="tip">Dica</option>
+              <option value="team">Equipe</option>
             </select>
           </div>
 
-          {/* Botão Enviar */}
+          {/* Botões */}
           <div className="form-actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={handleReset}
+              disabled={submitting}
+            >
+              <Trash2 size={16} className="button-icon" />
+              Limpar
+            </button>
             <button
               type="submit"
               disabled={submitting}
               aria-busy={submitting}
             >
+              <Send size={16} className="button-icon" />
               {submitting ? 'Enviando...' : 'Enviar Aviso'}
             </button>
           </div>

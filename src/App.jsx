@@ -19,8 +19,7 @@ function App() {
 
       <footer className="app-footer">
         <p>
-          Os dados são armazenados na coleção Firestore <code>noticeBoard</code>. Adicione
-          avisos a partir do painel do Firebase.
+          Mural alimentado por Firebase NoSQL para o PI III.
         </p>
       </footer>
     </main>

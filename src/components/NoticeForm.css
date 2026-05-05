@@ -41,6 +41,16 @@
   color: #333;
 }
 
+.label-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.label-icon {
+  color: #0275d8;
+}
+
 .form-group label span {
   color: #d9534f;
   margin-left: 0.25rem;
@@ -80,10 +90,21 @@
   min-height: 120px;
 }
 
+.char-counter {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.char-counter-warning {
+  color: #c00;
+}
+
 .form-actions {
   margin-top: 1.5rem;
   display: flex;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .form-actions button {
@@ -96,10 +117,25 @@
   background-color: #28a745;
   color: white;
   transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.secondary-button {
+  background-color: #6c757d;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background-color: #5a6268;
 }
 
 .form-actions button:hover:not(:disabled) {
   background-color: #218838;
+}
+
+.button-icon {
+  margin-right: 0.35rem;
 }
 
 .form-actions button:disabled {
