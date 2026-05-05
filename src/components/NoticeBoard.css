@@ -43,6 +43,8 @@
 .notice-filter-bar .filter-button:focus {
   background-color: #f0f0f0;
   border-color: #999;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .notice-filter-bar .filter-button-active {
@@ -166,21 +168,57 @@
   margin: 0;
 }
 
-.notice-board .notice-alert {
-  border-color: #d9534f;
-  background-color: #fff6f6;
+.notice-board .notice-message {
+  margin: 0.5rem 0;
+  line-height: 1.5;
 }
 
-.notice-board .notice-update {
-  border-color: #0275d8;
-  background-color: #f0f8ff;
+.notice-board .notice-message-truncated {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.notice-board time {
+.notice-board .notice-details {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eee;
+}
+
+.notice-board .notice-timestamp {
   display: block;
   color: #666;
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
+}
+
+.notice-board .notice-full-date {
+  color: #333;
+  font-weight: 500;
+}
+
+.notice-board .expand-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  margin-right: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.notice-board .expand-button:hover {
+  background-color: #5a6268;
+}
+
+.notice-board .expand-button:focus {
+  outline: 2px solid #333;
+  outline-offset: 2px;
 }
 
 .notice-board .error {

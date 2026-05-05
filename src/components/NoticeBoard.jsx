@@ -85,6 +85,7 @@ export function NoticeBoard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [activeFilter, setActiveFilter] = useState('all')
+  const [expandedItem, setExpandedItem] = useState(null)
 
   const filteredAnnouncements = useMemo(
     () =>
@@ -103,6 +104,10 @@ export function NoticeBoard() {
 
   function handleFilter(type) {
     setActiveFilter(type)
+  }
+
+  function toggleExpand(itemId) {
+    setExpandedItem(expandedItem === itemId ? null : itemId)
   }
 
   useEffect(() => {
@@ -207,6 +212,7 @@ export function NoticeBoard() {
         {filteredAnnouncements.map((item) => {
           const badge = badgeMap[item.type] ?? defaultBadge
           const Icon = badge.Icon
+          const isExpanded = expandedItem === item.id
 
           return (
             <li key={item.id}>
@@ -218,20 +224,41 @@ export function NoticeBoard() {
                   <span className={`notice-badge ${badge.color}`}>{badge.label}</span>
                   <h3>{item.title}</h3>
                 </div>
-                {item.createdAt && (
-                  <time dateTime={item.createdAt.toISOString()}>
+                <p className={`notice-message ${!isExpanded ? 'notice-message-truncated' : ''}`}>
+                  {item.message}
+                </p>
+                {!isExpanded && (
+                  <span className="notice-timestamp">
                     {formatRelativeDate(item.createdAt)}
-                  </time>
+                  </span>
                 )}
-                <p>{item.message}</p>
-                <button
-                  className="delete-button"
-                  onClick={() => handleDelete(item.id)}
-                  aria-label={`Excluir aviso: ${item.title}`}
-                  title="Excluir este aviso"
-                >
-                  🗑️ Excluir
-                </button>
+                {isExpanded && (
+                  <div className="notice-details">
+                    <span className="notice-full-date">
+                      Criado em: {item.createdAt.toLocaleDateString('pt-BR')} às {item.createdAt.toLocaleTimeString('pt-BR')}
+                    </span>
+                  </div>
+                )}
+                <div>
+                  <button
+                    type="button"
+                    className="expand-button"
+                    onClick={() => toggleExpand(item.id)}
+                    aria-expanded={isExpanded}
+                    aria-controls={`notice-details-${item.id}`}
+                  >
+                    {isExpanded ? 'Recolher' : 'Expandir'}
+                  </button>
+                  <button
+                    type="button"
+                    className="delete-button"
+                    onClick={() => handleDelete(item.id)}
+                    aria-label={`Excluir aviso: ${item.title}`}
+                    title="Excluir este aviso"
+                  >
+                    🗑️ Excluir
+                  </button>
+                </div>
               </article>
             </li>
           )
