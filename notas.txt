@@ -1,0 +1,6 @@
+Item			Link / Dado			Por que salvar?
+________________________________________________________________________________________________________________
+Console Firebase	console.firebase.google.com	Para gerenciar os avisos e as regras de segurança.
+ID do Projeto		mural-digital-workshop-connect	Caso precise rodar algum comando do Firebase CLI amanhã.
+Documentação Vite	vitejs.dev/guide/		Caso precise configurar algo novo no servidor.
+Localhost		http://localhost:5173		Seu endereço de trabalho padrão.

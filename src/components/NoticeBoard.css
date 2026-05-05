@@ -1,0 +1,78 @@
+.notice-board {
+  border: 2px solid #4c4c4c;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem auto;
+  max-width: 900px;
+  background: #f9f9f9;
+}
+
+.notice-board header h2 {
+  margin: 0 0 0.5rem;
+}
+
+.notice-board .notice-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.notice-board .notice-item {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background-color: #fff;
+}
+
+.notice-board .notice-item h3 {
+  margin: 0 0 0.25rem;
+}
+
+.notice-board .notice-alert {
+  border-color: #d9534f;
+  background-color: #fff6f6;
+}
+
+.notice-board .notice-update {
+  border-color: #0275d8;
+  background-color: #f0f8ff;
+}
+
+.notice-board time {
+  display: block;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.notice-board .error {
+  color: #c00;
+  font-weight: bold;
+}
+
+.notice-board .delete-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  transition: background-color 0.2s ease;
+}
+
+.notice-board .delete-button:hover {
+  background-color: #c82333;
+}
+
+.notice-board .delete-button:focus {
+  outline: 2px solid #333;
+  outline-offset: 2px;
+}
+
+.notice-board .delete-button:active {
+  background-color: #bd2130;
+}
