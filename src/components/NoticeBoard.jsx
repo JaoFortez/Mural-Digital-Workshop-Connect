@@ -4,7 +4,7 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDocs,
+  onSnapshot,
   orderBy,
   query,
   Timestamp,
@@ -18,15 +18,15 @@ export function NoticeBoard() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    async function loadAnnouncements() {
-      setLoading(true)
-      setError(null)
+    setLoading(true)
+    setError(null)
 
-      try {
-        const noticesRef = collection(db, 'noticeBoard')
-        const noticesQuery = query(noticesRef, orderBy('createdAt', 'desc'))
-        const snapshot = await getDocs(noticesQuery)
+    const noticesRef = collection(db, 'noticeBoard')
+    const noticesQuery = query(noticesRef, orderBy('createdAt', 'desc'))
 
+    const unsubscribe = onSnapshot(
+      noticesQuery,
+      (snapshot) => {
         const data = snapshot.docs.map((doc) => {
           const payload = doc.data()
           const ts = payload.createdAt instanceof Timestamp ? payload.createdAt.toDate() : null
@@ -40,15 +40,16 @@ export function NoticeBoard() {
         })
 
         setAnnouncements(data)
-      } catch (fetchError) {
+        setLoading(false)
+      },
+      (fetchError) => {
         console.error('Firestore fetch failed', fetchError)
         setError('Não foi possível carregar os avisos do mural. Por favor, tente novamente mais tarde.')
-      } finally {
         setLoading(false)
       }
-    }
+    )
 
-    loadAnnouncements()
+    return () => unsubscribe()
   }, [])
 
   async function handleDelete(docId) {
