@@ -41,13 +41,13 @@ function sortNotices(notices, sortOption, specificDate) {
       return sorted.sort((a, b) => b.createdAt - a.createdAt)
     case 'date':
       if (specificDate) {
-        const targetDate = new Date(specificDate)
+        const targetDate = new Date(specificDate + 'T00:00:00');
         return sorted.filter(notice => {
-          const noticeDate = new Date(notice.createdAt)
-          return noticeDate.toDateString() === targetDate.toDateString()
-        })
+          const noticeDate = new Date(notice.createdAt);
+          return noticeDate.toDateString() === targetDate.toDateString();
+        });
       }
-      return sorted
+      return sorted;
     default:
       return sorted
   }
@@ -306,13 +306,14 @@ export function NoticeBoard() {
               const dateValue = e.target.value;
               // Validar se a data é válida
               if (dateValue) {
-                const date = new Date(dateValue);
+                const date = new Date(dateValue + 'T00:00:00'); // Forçar horário 00:00:00
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
                 // Impedir datas futuras e datas muito antigas (mais de 10 anos)
                 const tenYearsAgo = new Date();
                 tenYearsAgo.setFullYear(today.getFullYear() - 10);
+                tenYearsAgo.setHours(0, 0, 0, 0);
 
                 if (date > today) {
                   alert('Não é possível filtrar por datas futuras.');
